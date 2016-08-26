@@ -1,0 +1,89 @@
+!ru.geekmonkey.bp.yaml.Config
+name             : getCreditToMomentCard
+description      : "Get credit to Momental Card"
+version          : 0.0.1
+authors          : Boykov Yuri
+useThreads       : true
+zabbixServerIp   : 10.33.44.55
+zabbixServerPort : 10051
+zabbixServerConnTimeout: 3
+forkProcessLogConfig: ""
+globalMacrosList :
+ - !ru.geekmonkey.bp.yaml.GlobalMacros
+   isCommand: true
+   commandType: external
+   name: MACROS_GLOBAL_eduid
+   value: "java -jar /bin/eduidGenerator/eduidGenerator.jar 32"
+steps:
+ - !ru.geekmonkey.bp.yaml.Step
+   enabled: true
+   id: 1
+   description: Description 1 GET here...
+   url: "http://ws.cdyne.com/emailverify/Emailvernotestemail.asmx"
+   timeoutConn: 5
+   timeoutRead: 3
+   dataType: text
+   data: "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:example=\"http://ws.cdyne.com/\">
+            <SOAP-ENV:Header/>
+              <SOAP-ENV:Body>
+                  <example:VerifyEmail>
+                      <example:email>MACROS_email</example:email>
+                      <example:LicenseKey>MACROS_GLOBAL_eduid</example:LicenseKey>
+                  </example:VerifyEmail>
+              </SOAP-ENV:Body>
+          </SOAP-ENV:Envelope>"
+   macrosList:
+    - !ru.geekmonkey.bp.yaml.Macros
+      isCommand: false
+      commandType: internal
+      name: MACROS_email
+      value: neiromc@gmail.com
+   zabbixSendEnabled: false
+   zabbixHost: some.host.bin.bank
+   zabbixKey: bpStepResult_01
+   resultCheckMethod: getLastResult
+   resultCheckExpression: none
+ - !ru.geekmonkey.bp.yaml.Step
+   enabled: true
+   id: 2
+   description: Description 2 SET here...
+   sleepBeforeRun: 10000
+   url: "http://ws.cdyne.com/emailverify/Emailvernotestemail.asmx"
+   timeoutConn: 4
+   timeoutRead: 5
+   dataType: text
+   data: "<?xml version=\"1.0\" encoding=\"utf-8\"?>
+          <soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">
+            <soap:Body>
+              <VerifyEmail xmlns=\"http://ws.cdyne.com/\">
+                <email>neiromc@gmail.com</email>
+                <LicenseKey>string</LicenseKey>
+                <LicenseKey3>MACROS_VAL_2</LicenseKey3>
+                <LicenseKey5>MACROS_GLOBAL_eduid</LicenseKey5>
+              </VerifyEmail>
+            </soap:Body>
+          </soap:Envelope>"
+   macrosList:
+    - !ru.geekmonkey.bp.yaml.Macros
+      isCommand: false
+      commandType: internal
+      name: "MACROS_VAL_2"
+      value: "028379835901390235y093u523-My Super License Number"
+   zabbixSendEnabled: true
+   zabbixHost: some.host.bin.bank
+   zabbixKey: bpStepResult_02
+   resultCheckMethod: stringArray
+   resultCheckExpression: "Mail Server will accept email;;<ResponseCode>3</ResponseCode>;;gmail-smtp-in.l.google.com;;<GoodEmail>true</GoodEmail>"
+ - !ru.geekmonkey.bp.yaml.Step
+   enabled: false
+   id: 3
+   description: Description 3 PUT here...
+   url: "http://some.url.com/putAccount?wsdl"
+   timeoutConn: 10
+   timeoutRead: 10
+   dataType: file
+   data: "XML 3"
+   zabbixHost: some.host.bin.bank
+   zabbixKey: bpStepResult_03
+   resultCheckMethod: grep
+   resultCheckExpression: "some grep text here"
