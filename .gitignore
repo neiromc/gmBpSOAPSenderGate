@@ -17,3 +17,6 @@ hs_err_pid*
 #Other dirs
 out/
 target/
+
+#Other files
+bpSoapSender.iml
