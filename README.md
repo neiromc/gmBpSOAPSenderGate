@@ -1,3 +1,4 @@
+:no_entry: [DEPRECATED]
 * GeekMonkey SOAP Sender Gate
 * Version 0.0.8
 
